@@ -61,6 +61,22 @@ module CalendarHelper
   #     end
   #   end
   #
+  #   With texts and links in special days
+  #
+  #   @listOfSpecialDays = [ '2010-11-25'.to_date, '2010-11-29'.to_date ]
+  #   @listOfSpecialDetails = {
+  #     '2010-11-25' => [:day => '2010-11-25', :label => "<br />A text with <a href='#'>link</a>."],
+  #     '2010-11-29' => [:day => '2010-11-29']
+  #   }
+  #
+  #   calendar({:year => 2010, :month => 11}) do |d|
+  #     if @listOfSpecialDays.include?(d)
+  #       [d.mday, {:class => "specialDay", :label => @listOfSpecialDetails[d.to_s][0][:label] } ]
+  #     else
+  #       [d.mday, {:class => "normalDay", :label => ''} ]
+  #     end
+  #   end
+  #
   # An additional 'weekend' class is applied to weekend days. 
   #
   # For consistency with the themes provided in the calendar_styles generator, use "specialDay" as the CSS class for marked days.
@@ -138,6 +154,7 @@ module CalendarHelper
       cell_text, cell_attrs = block.call(cur)
       cell_text  ||= cur.mday
       cell_attrs ||= {}
+      cell_text = "#{cell_text}#{cell_attrs[:label]}" unless cell_attrs[:label].nil?
       cell_attrs[:class] ||= options[:day_class]
       cell_attrs[:class] += " weekendDay" if [0, 6].include?(cur.wday)
       today = (Time.respond_to?(:zone) && !(zone = Time.zone).nil? ? zone.now.to_date : Date.today)
