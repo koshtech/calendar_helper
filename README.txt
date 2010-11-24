@@ -23,6 +23,22 @@ There is also a Rails generator that copies some stylesheets for use alone or al
     end
   end
 
+  With texts and links in special days
+
+  @listOfSpecialDays = [ '2010-11-25'.to_date, '2010-11-29'.to_date ]
+  @listOfSpecialDetails = {
+    '2010-11-25' => [:day => '2010-11-25', :label => "<br />A text with <a href='#'>link</a>."],
+    '2010-11-29' => [:day => '2010-11-29']
+  }
+
+  calendar({:year => 2010, :month => 11}) do |d|
+    if @listOfSpecialDays.include?(d)
+      [d.mday, {:class => "specialDay", :label => @listOfSpecialDetails[d.to_s][0][:label] } ]
+    else
+      [d.mday, {:class => "normalDay", :label => ''} ]
+    end
+  end
+
 If using with ERb (Rails), put in a printing tag.
 
   <%= calendar(:year => @year, :month => @month, :first_day_of_week => 1) do |d|
