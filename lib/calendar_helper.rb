@@ -113,7 +113,7 @@ module CalendarHelper
     first_weekday.times do
       day_names.push(day_names.shift)
     end
-
+    
     # TODO Use some kind of builder instead of straight HTML
     cal = %(<table class="#{options[:table_class]}" border="0" cellspacing="0" cellpadding="0">)
     cal << %(<thead>)
@@ -173,6 +173,104 @@ module CalendarHelper
       end
     end unless last.wday == last_weekday
     cal << "</tr></tbody></table>"
+    
+  end
+  
+  def tableless_calendar(options = {}, &block)
+    raise(ArgumentError, "No year given")  unless options.has_key?(:year)
+    raise(ArgumentError, "No month given") unless options.has_key?(:month)
+
+    block ||= Proc.new {|d| nil}
+
+    defaults = {
+      :main_class => 'calendar',
+      :container_class => 'calendar-container',
+      :month_name_class => 'month-name',
+      :past_day_class => 'past-day',
+      :day_name_class => 'day-name',
+      :day_class => 'day',
+      :today_class => 'today',
+      :future_day_class => 'future-day',
+      :weekend_class => 'weekend',
+      :weekend_day_name_class => 'weekend-day-name',
+      :abbrev => (0..2),
+      :first_day_of_week => 0,
+      :accessible => false,
+      :show_today => true,
+      :previous_month_text => nil,
+      :next_month_text => nil,
+      :month_header => true
+    }
+    options = defaults.merge options
+
+    first = Date.civil(options[:year], options[:month], 1)
+    last = Date.civil(options[:year], options[:month], -1)
+
+    first_weekday = first_day_of_week(options[:first_day_of_week])
+    last_weekday = last_day_of_week(options[:first_day_of_week])
+    
+    day_names = Date::DAYNAMES.dup
+    first_weekday.times do
+      day_names.push(day_names.shift)
+    end
+  
+    cal = %(<div id="#{options[:main_class]}">)
+    if (options[:month_header])
+      cal << %(<h1 class="#{options[:month_name_class]}">)
+      cal << "#{options[:previous_month_text]} " if options[:previous_month_text]
+      cal << "#{Date::MONTHNAMES[options[:month]]}"
+      cal << %( #{options[:next_month_text]}) if options[:next_month_text]
+      cal << %(</h1>)
+    end
+		cal << %(<div id="#{options[:container_class]}">)
+
+    day_names.each do |d|
+      unless d[options[:abbrev]].eql? d
+        cal << %(	<div class="#{options[:day_class]} #{options[:day_name_class]}" <abbr title="#{d}">)
+		    cal << %(		<span>#{d[options[:abbrev]]}</span></abbr>)
+		    cal << %(	</div>)
+      else
+        cal << %(	<div class="#{options[:weekend_day_name_class]}" title="#{d}">)
+		    cal << %(		<span>#{d[options[:abbrev]]}</span>)
+		    cal << %(	</div>)
+      end
+    end
+
+    beginning_of_week(first, first_weekday).upto(first - 1) do |d|
+      cal << %(<div class="#{options[:day_class]})
+      cal << " #{options[:weekend_class]}" if weekend?(d)
+      if options[:accessible]
+        cal << %(">#{d.day}<span class="hidden"> #{Date::MONTHNAMES[d.month]}</span></div>)
+      else
+        cal << %(">#{d.day}</div>)
+      end
+    end unless first.wday == first_weekday
+    
+    first.upto(last) do |cur|
+      cell_text, cell_attrs = block.call(cur)
+      cell_text  ||= cur.mday
+      cell_attrs ||= {}
+      cell_text = "#{cell_text} #{cell_attrs[:label]}" unless cell_attrs[:label].nil?
+      cell_attrs[:day_class] ||= options[:day_class]
+      cell_attrs[:day_class] += " #{options[:weekend_class]}" if [0, 6].include?(cur.wday)
+      today = (Time.respond_to?(:zone) && !(zone = Time.zone).nil? ? zone.now.to_date : Date.today)
+      cell_attrs[:day_class] += " #{options[:today_class]}" if (cur == today) and options[:show_today]
+      cal << %(<div class="#{cell_attrs[:day_class]}"><span>#{cell_text}</span></div>) ###  if cur.wday == last_weekday
+    end
+
+    (last + 1).upto(beginning_of_week(last + 7, first_weekday) - 1)  do |d|
+      cal << %(<div class="#{options[:day_class]} #{options[:future_day_class]})
+      cal << " weekend" if weekend?(d)
+      if options[:accessible]
+        cal << %(">#{d.day}<span class='hidden'> #{Date::MONTHNAMES[d.mon]}</span></td>)
+      else
+        cal << %(">#{d.day}</div>)        
+      end
+    end unless last.wday == last_weekday
+		
+		cal << %(</div>)
+    cal << %(</div>)
+
   end
   
   private
