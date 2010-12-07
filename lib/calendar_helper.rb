@@ -199,7 +199,8 @@ module CalendarHelper
       :show_today => true,
       :previous_month_text => nil,
       :next_month_text => nil,
-      :month_header => true
+      :month_header => true,
+      :month_header_position => 'top'
     }
     options = defaults.merge options
 
@@ -215,13 +216,20 @@ module CalendarHelper
     end
   
     cal = %(<div id="#{options[:main_class]}">)
+    month_header = %()
+    
     if (options[:month_header])
-      cal << %(<h1 class="#{options[:month_name_class]}">)
-      cal << "#{options[:previous_month_text]} " if options[:previous_month_text]
-      cal << "#{Date::MONTHNAMES[options[:month]]}"
-      cal << %( #{options[:next_month_text]}) if options[:next_month_text]
-      cal << %(</h1>)
+      month_header << %(<h1 class="#{options[:month_name_class]}">)
+      month_header << "#{options[:previous_month_text]} " if options[:previous_month_text]
+      month_header << "#{Date::MONTHNAMES[options[:month]]}"
+      month_header << %( #{options[:next_month_text]}) if options[:next_month_text]
+      month_header << %(</h1>)
     end
+    
+    if options[:month_header_position] == 'top'
+      cal <<  month_header
+    end
+    
 		cal << %(<div id="#{options[:container_class]}">)
 
     day_names.each do |d|
@@ -269,6 +277,11 @@ module CalendarHelper
     end unless last.wday == last_weekday
 		
 		cal << %(</div>)
+		
+    if options[:month_header_position] == 'bottom'
+      cal << month_header
+    end
+		
     cal << %(</div>)
 
   end
