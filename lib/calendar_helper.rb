@@ -249,11 +249,13 @@ module CalendarHelper
     beginning_of_week(first, first_weekday).upto(first - 1) do |d|
       cal << %(<div class="#{options[:day_class]} #{options[:previous_month_day_class]})
       cal << " #{options[:weekend_class]}" if weekend?(d)
+      cal << %("><span>#{d.day}</span>)
+      
       if options[:accessible]
-        cal << %(">#{d.day}<span class="hidden"> #{Date::MONTHNAMES[d.month]}</span></div>)
-      else
-        cal << %(">#{d.day}</div>)
+        cal << %(<span class="hidden"> #{Date::MONTHNAMES[d.month]}</span>)
       end
+      cal << %(</div>)
+      
     end unless first.wday == first_weekday
     
     first.upto(last) do |cur|
@@ -271,11 +273,12 @@ module CalendarHelper
     (last + 1).upto(beginning_of_week(last + 7, first_weekday) - 1)  do |d|
       cal << %(<div class="#{options[:day_class]} #{options[:next_month_day_class]})
       cal << " #{options[:weekend_class]}" if weekend?(d)
+      cal << %("><span>#{d.day}</span>)
+      
       if options[:accessible]
-        cal << %(">#{d.day}<span class='hidden'> #{Date::MONTHNAMES[d.mon]}</span></td>)
-      else
-        cal << %(">#{d.day}</div>)        
+        cal << %(<span class="hidden"> #{Date::MONTHNAMES[d.month]}</span>)
       end
+      cal << %(</div>)
     end unless last.wday == last_weekday
 		
 		cal << %(</div>)
