@@ -192,6 +192,7 @@ module CalendarHelper
       :today_class => 'today',
       :weekend_class => 'weekend',
       :weekend_day_name_class => 'weekend-day-name',
+      :weekdays_header => true,
       :abbrev => (0..2),
       :first_day_of_week => 0,
       :accessible => false,
@@ -234,15 +235,17 @@ module CalendarHelper
     
 		cal << %(<div id="#{options[:container_class]}">)
 
-    day_names.each do |d|
-      unless d[options[:abbrev]].eql? d
-        cal << %(	<div class="#{options[:day_class]} #{options[:day_name_class]}" <abbr title="#{d}">)
-		    cal << %(		<span>#{d[options[:abbrev]]}</span></abbr>)
-		    cal << %(	</div>)
-      else
-        cal << %(	<div class="#{options[:weekend_day_name_class]}" title="#{d}">)
-		    cal << %(		<span>#{d[options[:abbrev]]}</span>)
-		    cal << %(	</div>)
+    if (options[:weekdays_header])
+      day_names.each do |d|
+        unless d[options[:abbrev]].eql? d
+          cal << %(	<div class="#{options[:day_class]} #{options[:day_name_class]}" <abbr title="#{d}">)
+		      cal << %(		<span>#{d[options[:abbrev]]}</span></abbr>)
+		      cal << %(	</div>)
+        else
+          cal << %(	<div class="#{options[:weekend_day_name_class]}" title="#{d}">)
+		      cal << %(		<span>#{d[options[:abbrev]]}</span>)
+		      cal << %(	</div>)
+        end
       end
     end
 
