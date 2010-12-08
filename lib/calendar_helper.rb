@@ -190,7 +190,6 @@ module CalendarHelper
       :day_name_class => 'day-name',
       :day_class => 'day',
       :today_class => 'today',
-      :future_day_class => 'future-day',
       :weekend_class => 'weekend',
       :weekend_day_name_class => 'weekend-day-name',
       :abbrev => (0..2),
@@ -198,9 +197,11 @@ module CalendarHelper
       :accessible => false,
       :show_today => true,
       :previous_month_text => nil,
-      :previous_month_position => nil,
+      :previous_month_position => 'top',
+      :previous_month_day_class => 'previous_month_day',
       :next_month_text => nil,
-      :previous_month_position => nil,
+      :next_month_position => 'top',
+      :next_month_day_class => 'next_month_day',
       :month_header => true,
       :month_header_position => 'top'
     }
@@ -246,7 +247,7 @@ module CalendarHelper
     end
 
     beginning_of_week(first, first_weekday).upto(first - 1) do |d|
-      cal << %(<div class="#{options[:day_class]})
+      cal << %(<div class="#{options[:day_class]} #{options[:previous_month_day_class]})
       cal << " #{options[:weekend_class]}" if weekend?(d)
       if options[:accessible]
         cal << %(">#{d.day}<span class="hidden"> #{Date::MONTHNAMES[d.month]}</span></div>)
@@ -268,8 +269,8 @@ module CalendarHelper
     end
 
     (last + 1).upto(beginning_of_week(last + 7, first_weekday) - 1)  do |d|
-      cal << %(<div class="#{options[:day_class]} #{options[:future_day_class]})
-      cal << " weekend" if weekend?(d)
+      cal << %(<div class="#{options[:day_class]} #{options[:next_month_day_class]})
+      cal << " #{options[:weekend_class]}" if weekend?(d)
       if options[:accessible]
         cal << %(">#{d.day}<span class='hidden'> #{Date::MONTHNAMES[d.mon]}</span></td>)
       else
