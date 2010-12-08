@@ -198,7 +198,9 @@ module CalendarHelper
       :accessible => false,
       :show_today => true,
       :previous_month_text => nil,
+      :previous_month_position => nil,
       :next_month_text => nil,
+      :previous_month_position => nil,
       :month_header => true,
       :month_header_position => 'top'
     }
@@ -216,18 +218,17 @@ module CalendarHelper
     end
   
     cal = %(<div id="#{options[:main_class]}">)
-    month_header = %()
     
-    if (options[:month_header])
-      month_header << %(<h1 class="#{options[:month_name_class]}">)
-      month_header << "#{options[:previous_month_text]} " if options[:previous_month_text]
-      month_header << "#{Date::MONTHNAMES[options[:month]]}"
-      month_header << %( #{options[:next_month_text]}) if options[:next_month_text]
-      month_header << %(</h1>)
+    if options[:previous_month_position] == 'top'
+      cal << "#{options[:previous_month_text]} " if options[:previous_month_text]
     end
     
     if options[:month_header_position] == 'top'
-      cal <<  month_header
+      cal <<  %(<div class="#{options[:month_name_class]}">#{Date::MONTHNAMES[options[:month]]}</div>) if options[:month_header]
+    end
+    
+    if options[:next_month_position] == 'top'
+      cal << "#{options[:next_month_text]} " if options[:next_month_text]
     end
     
 		cal << %(<div id="#{options[:container_class]}">)
@@ -278,8 +279,16 @@ module CalendarHelper
 		
 		cal << %(</div>)
 		
+    if options[:previous_month_position] == 'bottom'
+      cal << "#{options[:previous_month_text]} " if options[:previous_month_text]
+    end
+    
     if options[:month_header_position] == 'bottom'
-      cal << month_header
+      cal <<  %(<div class="#{options[:month_name_class]}">#{Date::MONTHNAMES[options[:month]]}</div>) if options[:month_header]
+    end
+    
+    if options[:next_month_position] == 'bottom'
+      cal << "#{options[:next_month_text]} " if options[:next_month_text]
     end
 		
     cal << %(</div>)
